@@ -44,35 +44,45 @@ namespace Plugin {
         ASSERT (service != nullptr);
         ASSERT (_implementation == nullptr);
         ASSERT (_connectionId == 0);
-
+        printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>Entered\n", getpid(), gettid());
         _service = service;
+        printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>calling _service->AddRef()\n", getpid(), gettid());
         _service->AddRef();
+        printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>calling _service->Register(&_connectionNotification)\n", getpid(), gettid());
         _service->Register(&_connectionNotification);
 
+        printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>calling _service->Root<Exchange::IVolumeControl>()\n", getpid(), gettid());
         _implementation = _service->Root<Exchange::IVolumeControl>(_connectionId, 2000, _T("VolumeControlImplementation"));
         if (_implementation == nullptr) {
             message = _T("Couldn't create volume control instance");
         } else {
+          printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>calling _implementation->Register(&_volumeNotification)\n", getpid(), gettid());
           _implementation->Register(&_volumeNotification);
+          printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>calling Exchange::JVolumeControl::Register(*this, _implementation)\n", getpid(), gettid());
           Exchange::JVolumeControl::Register(*this, _implementation);
         }
-
+        printf("WPEFramework::Plugin::VolumeControl::Initialize()->PID<%d><%d>Exit \n", getpid(), gettid());
         return (message);
     }
 
     void VolumeControl::Deinitialize(PluginHost::IShell* service)
     {
+        printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>Entered\n", getpid(), gettid());
         if (_service != nullptr) {
             ASSERT(_service == service);
-
+            printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling service->Unregister(&_connectionNotification)\n", getpid(), gettid());
             service->Unregister(&_connectionNotification);
 
             if (_implementation != nullptr) {
 
+                printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling Exchange::JVolumeControl::Unregister(*this)\n", getpid(), gettid());
                 Exchange::JVolumeControl::Unregister(*this);
+                printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling _implementation->Unregister(&_volumeNotification)\n", getpid(), gettid());
                 _implementation->Unregister(&_volumeNotification);
 
+                printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling connection(_service->RemoteConnection(_connectionId))\n", getpid(), gettid());
                 RPC::IRemoteConnection* connection(_service->RemoteConnection(_connectionId));
+                printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling _implementation->Release()\n", getpid(), gettid());
                 VARIABLE_IS_NOT_USED uint32_t result = _implementation->Release();
                 _implementation = nullptr;
                 // It should have been the last reference we are releasing,
@@ -81,12 +91,14 @@ namespace Plugin {
                 ASSERT(result == Core::ERROR_DESTRUCTION_SUCCEEDED);
                 // The process can disappear in the meantime...
                 if (connection != nullptr) {
+                    printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling connection->Terminate()\n", getpid(), gettid());
                     // But if it did not dissapear in the meantime, forcefully terminate it. Shoot to kill :-)
                     connection->Terminate();
+                    printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling cconnection->Release()\n", getpid(), gettid());
                     connection->Release();
                 }
             }
-
+            printf("WPEFramework::Plugin::VolumeControl::Deinitialize()->PID<%d><%d>calling _service->Release()\n", getpid(), gettid());
             _service->Release();
             _service = nullptr;
             _connectionId = 0;
@@ -100,6 +112,7 @@ namespace Plugin {
 
     void VolumeControl::Deactivated(RPC::IRemoteConnection* connection)
     {
+        printf("WPEFramework::Plugin::VolumeControl::Deactivated()->PID<%d><%d>\n", getpid(), gettid());
         if (connection->Id() == _connectionId) {
             ASSERT(_service != nullptr);
             Core::IWorkerPool::Instance().Submit(PluginHost::IShell::Job::Create(_service,

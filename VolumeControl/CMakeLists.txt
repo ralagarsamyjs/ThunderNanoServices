@@ -31,6 +31,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 set(PLAFORM_VOLUMECONTROL volumectrlplatform)
 set(PLUGIN_VOLUMECONTROL_AUTOSTART true CACHE STRING "Automatically start VolumeControl plugin")
+set(PLUGIN_VOLUMECONTROL_MODE "Local" CACHE STRING "Controls if the plugin should run in its own process, in process or remote.")
 
 find_package(${NAMESPACE}Plugins REQUIRED)
 find_package(${NAMESPACE}Definitions REQUIRED)
