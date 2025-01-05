@@ -38,10 +38,12 @@ namespace Plugin {
             , _connectionNotification(this)
             , _volumeNotification(this)
         {
+            printf("WPEFramework::Plugin::VolumeControl::VolumeControl()->PID<%d><%d>Constructor \n", getpid(), gettid());
         }
 
         ~VolumeControl() override
         {
+            printf("WPEFramework::Plugin::VolumeControl::~VolumeControl()->PID<%d><%d>Destructor \n", getpid(), gettid());
         }
 
         BEGIN_INTERFACE_MAP(VolumeControl)
@@ -72,10 +74,12 @@ namespace Plugin {
 
             void Activated(RPC::IRemoteConnection*) override
             {
+                printf("WPEFramework::Plugin::VolumeControl::ConnectionNotification::Activated()->PID<%d><%d> Entered \n", getpid(), gettid());
             }
 
             void Deactivated(RPC::IRemoteConnection* connection) override
             {
+                printf("WPEFramework::Plugin::VolumeControl::ConnectionNotification::Deactivated()->PID<%d><%d> calling _parent.Deactivated() \n", getpid(), gettid());
                 _parent.Deactivated(connection);
             }
 
@@ -93,6 +97,7 @@ namespace Plugin {
                 : _parent(*parent)
             {
                 ASSERT(parent != nullptr);
+                printf("WPEFramework::Plugin::VolumeControl::VolumeNotification::VolumeNotification()->PID<%d><%d>Constructor \n", getpid(), gettid());
             }
 
             ~VolumeNotification() override = default;
@@ -103,11 +108,13 @@ namespace Plugin {
 
             void Volume(const uint8_t volume) override
             {
+                printf("WPEFramework::Plugin::VolumeControl::VolumeNotification::Volume()->PID<%d><%d> calling Exchange::JVolumeControl::Event::Volume()\n", getpid(), gettid());
                 Exchange::JVolumeControl::Event::Volume(_parent, volume);
             }
 
             void Muted(const bool muted) override
             {
+                printf("WPEFramework::Plugin::VolumeControl::VolumeNotification::Muted()->PID<%d><%d> calling Exchange::JVolumeControl::Event::Muted()\n", getpid(), gettid());
                 Exchange::JVolumeControl::Event::Muted(_parent, muted);
             }
 
