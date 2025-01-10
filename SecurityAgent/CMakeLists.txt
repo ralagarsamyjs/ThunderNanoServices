@@ -1,7 +1,7 @@
 # If not stated otherwise in this file or this component's LICENSE file the
 # following copyright and licenses apply:
 #
-# Copyright 2020 Metrological
+# Copyright 2020 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-project(SystemdConnector)
+project(SecurityAgent)
 
 cmake_minimum_required(VERSION 3.3)
 
@@ -27,17 +27,28 @@ set(MODULE_NAME ${NAMESPACE}${PROJECT_NAME})
 
 message("Setup ${MODULE_NAME} v${PROJECT_VERSION}")
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-
-# set(PLUGIN_SYSTEMDCONNECTOR_AUTOSTART true CACHE STRING "Automatically start SystemdConnector plugin")
+set(PLUGIN_SECURITYAGENT_AUTOSTART "true" CACHE STRING "Automatically start SecurityAgent plugin")
+set(PLUGIN_SECURITYAGENT_STARTUPORDER "" CACHE STRING "To configure startup order of SecurityAgent plugin")
 
 find_package(${NAMESPACE}Plugins REQUIRED)
 find_package(CompileSettingsDebug CONFIG REQUIRED)
-# find_package(Systemd REQUIRED)
 
-add_library(${MODULE_NAME} SHARED 
-    SystemdConnector.cpp
+find_library(SECAPI NAMES ${SECAPI_LIB})
+if (SECAPI)
+    set(SECAPI_RELATED_SOURCES SecapiToken.cpp)
+endif()
+
+add_library(${MODULE_NAME} SHARED
+    AccessControlList.cpp
+    SecurityAgent.cpp
+    SecurityContext.cpp
+    SecurityAgentJsonRpc.cpp
+    ${SECAPI_RELATED_SOURCES}
     Module.cpp)
+
+# Following compilation flag is added as SecurityAgent plugin uses regex that 
+# prevents the plugin from unloading from memory after deactivation.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique")
 
 set_target_properties(${MODULE_NAME} PROPERTIES
         CXX_STANDARD 11
@@ -46,8 +57,12 @@ set_target_properties(${MODULE_NAME} PROPERTIES
 target_link_libraries(${MODULE_NAME} 
     PRIVATE
         CompileSettingsDebug::CompileSettingsDebug
-        ${NAMESPACE}Plugins::${NAMESPACE}Plugins
-        ${SYSTEMD_LIBRARIES})
+        ${NAMESPACE}Plugins::${NAMESPACE}Plugins)
+
+if (SECAPI)
+    target_link_libraries(${MODULE_NAME} PRIVATE ${SECAPI_LIB})
+    add_definitions(-DENABLE_SECAPI)
+endif()
 
 install(TARGETS ${MODULE_NAME} 
     DESTINATION lib/${STORAGE_DIRECTORY}/plugins)

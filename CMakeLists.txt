@@ -242,5 +242,9 @@ if(PLUGIN_FILETRANSFER)
     add_subdirectory(FileTransfer)
 endif()
 
+if(PLUGIN_SECURITYAGENT)
+	add_subdirectory(SecurityAgent)
+endif()
+
 add_subdirectory(examples)
 add_subdirectory(tests)

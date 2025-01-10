@@ -16,6 +16,7 @@
 # limitations under the License.
 
 find_package(${NAMESPACE}COM REQUIRED)
+find_package(${NAMESPACE}Core REQUIRED)
 find_package(CompileSettingsDebug CONFIG REQUIRED)
 
 add_executable(COMRPCClient COMRPCClient.cpp)
@@ -28,6 +29,7 @@ set_target_properties(COMRPCClient PROPERTIES
 target_link_libraries(COMRPCClient 
         PRIVATE
         ${NAMESPACE}COM::${NAMESPACE}COM
+	${NAMESPACE}Core::${NAMESPACE}Core
         CompileSettingsDebug::CompileSettingsDebug
     )
 

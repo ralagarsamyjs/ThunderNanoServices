@@ -85,129 +85,129 @@
 #include <com/com.h>
 #include <definitions/definitions.h>
 #include <plugins/Types.h>
-#include <interfaces/IDictionary.h>
+// #include <interfaces/IAuthenticate.h>
 #include <iostream>
 
 MODULE_NAME_DECLARATION(BUILD_REFERENCE);
 
 namespace Thunder = WPEFramework;
 
-class Sink : public Thunder::Exchange::IDictionary::INotification {
-public:
-    Sink() = delete;
-    Sink(Sink&&) = delete;
-    Sink(const Sink&) = delete;
-    Sink& operator= (const Sink&) = delete;
+// class Sink : public Thunder::Exchange::IAuthenticate::INotification {
+// public:
+//     Sink() = delete;
+//     Sink(Sink&&) = delete;
+//     Sink(const Sink&) = delete;
+//     Sink& operator= (const Sink&) = delete;
 
-    Sink(Thunder::Exchange::IDictionary* source)
-        : _source(source) {
-        _source->AddRef();
-    }
-    ~Sink() override {
-        _source->Release();
-    }
+//     Sink(Thunder::Exchange::IDictionary* source)
+//         : _source(source) {
+//         _source->AddRef();
+//     }
+//     ~Sink() override {
+//         _source->Release();
+//     }
 
-public:
-    void Modified(const string& nameSpace, const string& key, const string& value) override {
-        printf("In namespace [%s], the key [%s] has a new value: [%s]\n", nameSpace.c_str(), key.c_str(), value.c_str());
-    }
+// public:
+//     void Modified(const string& nameSpace, const string& key, const string& value) override {
+//         printf("In namespace [%s], the key [%s] has a new value: [%s]\n", nameSpace.c_str(), key.c_str(), value.c_str());
+//     }
 
-    BEGIN_INTERFACE_MAP(Sink)
-        INTERFACE_ENTRY(Thunder::Exchange::IDictionary::INotification);
-    END_INTERFACE_MAP
+//     BEGIN_INTERFACE_MAP(Sink)
+//         INTERFACE_ENTRY(Thunder::Exchange::IDictionary::INotification);
+//     END_INTERFACE_MAP
 
-private:
-    Thunder::Exchange::IDictionary* _source;
-};
+// private:
+//     Thunder::Exchange::IDictionary* _source;
+// };
 
-class Dictionary : public Thunder::RPC::SmartInterfaceType<Thunder::Exchange::IDictionary > {
-private:
-    using BaseClass = Thunder::RPC::SmartInterfaceType<Thunder::Exchange::IDictionary >;
-public:
-    Dictionary(const uint32_t waitTime, const Thunder::Core::NodeId& node, const string& callsign)
-        : BaseClass() {
-        BaseClass::Open(waitTime, node, callsign);
-    }
-    ~Dictionary() {
-        BaseClass::Close(Thunder::Core::infinite);
-    }
+// class Dictionary : public Thunder::RPC::SmartInterfaceType<Thunder::Exchange::IAuthenticate > {
+// private:
+//     using BaseClass = Thunder::RPC::SmartInterfaceType<Thunder::Exchange::IAuthenticate >;
+// public:
+//     Dictionary(const uint32_t waitTime, const Thunder::Core::NodeId& node, const string& callsign)
+//         : BaseClass() {
+//         BaseClass::Open(waitTime, node, callsign);
+//     }
+//     ~Dictionary() {
+//         BaseClass::Close(Thunder::Core::infinite);
+//     }
 
-public:
-    bool Get(const string& nameSpace, const string& key, string& value ) const {
-        bool result = false;
-        const Thunder::Exchange::IDictionary* impl = BaseClass::Interface();
+// public:
+//     bool Get(const string& nameSpace, const string& key, string& value ) const {
+//         bool result = false;
+//         const Thunder::Exchange::IAuthenticate* impl = BaseClass::Interface();
 
-        if (impl != nullptr) {
-            result = impl->Get(nameSpace, key, value);
-            impl->Release();
-        }
+//         if (impl != nullptr) {
+//             result = impl->Get(nameSpace, key, value);
+//             impl->Release();
+//         }
 
-        return (result);
-    }
-    bool Set(const string& nameSpace, const string& key, const string& value) {
-        bool result = false;
-        Thunder::Exchange::IDictionary* impl = BaseClass::Interface();
+//         return (result);
+//     }
+//     bool Set(const string& nameSpace, const string& key, const string& value) {
+//         bool result = false;
+//         Thunder::Exchange::IAuthenticate* impl = BaseClass::Interface();
 
-        if (impl != nullptr) {
-            result = impl->Set(nameSpace, key, value);
-            impl->Release();
-        }
+//         if (impl != nullptr) {
+//             result = impl->Set(nameSpace, key, value);
+//             impl->Release();
+//         }
 
-        return (result);
-    }
+//         return (result);
+//     }
 
-private:
-    void Operational(const bool upAndRunning) {
-        printf("Operational state of Dictionary: %s\n", upAndRunning ? _T("true") : _T("false"));
-    }
-};
+// private:
+//     void Operational(const bool upAndRunning) {
+//         printf("Operational state of Dictionary: %s\n", upAndRunning ? _T("true") : _T("false"));
+//     }
+// };
 
-class WorkerPoolImplementation 
-    : public Thunder::Core::IIPCServer
-    , public Thunder::Core::ThreadPool::IDispatcher
-    , public Thunder::Core::WorkerPool {
-public:
-    WorkerPoolImplementation() = delete;
-    WorkerPoolImplementation(WorkerPoolImplementation&&) = delete;
-    WorkerPoolImplementation(const WorkerPoolImplementation&) = delete;
-    WorkerPoolImplementation& operator=(const WorkerPoolImplementation&) = delete;
+// class WorkerPoolImplementation 
+//     : public Thunder::Core::IIPCServer
+//     , public Thunder::Core::ThreadPool::IDispatcher
+//     , public Thunder::Core::WorkerPool {
+// public:
+//     WorkerPoolImplementation() = delete;
+//     WorkerPoolImplementation(WorkerPoolImplementation&&) = delete;
+//     WorkerPoolImplementation(const WorkerPoolImplementation&) = delete;
+//     WorkerPoolImplementation& operator=(const WorkerPoolImplementation&) = delete;
 
-    PUSH_WARNING(DISABLE_WARNING_THIS_IN_MEMBER_INITIALIZER_LIST)
-    WorkerPoolImplementation(const uint8_t threads, const uint32_t stackSize, const uint32_t queueSize)
-        : WorkerPool(threads, stackSize, queueSize, this, nullptr) {
-        //, _announceHandler(nullptr) {
-        Thunder::Core::IWorkerPool::Assign(this);
-    }
-    POP_WARNING()
+//     PUSH_WARNING(DISABLE_WARNING_THIS_IN_MEMBER_INITIALIZER_LIST)
+//     WorkerPoolImplementation(const uint8_t threads, const uint32_t stackSize, const uint32_t queueSize)
+//         : WorkerPool(threads, stackSize, queueSize, this, nullptr) {
+//         //, _announceHandler(nullptr) {
+//         Thunder::Core::IWorkerPool::Assign(this);
+//     }
+//     POP_WARNING()
 
-    ~WorkerPoolImplementation() override {
-        Thunder::Core::IWorkerPool::Assign(nullptr);
-    }
+//     ~WorkerPoolImplementation() override {
+//         Thunder::Core::IWorkerPool::Assign(nullptr);
+//     }
 
-private:
-    // ThreadPool::IDispatcher
-    // -------------------------------------------------------------
-    void Initialize() override {
-    }
-    void Deinitialize() override {
-    }
-    void Dispatch(Thunder::Core::IDispatch* job) override {
-        job->Dispatch();
-    }
+// private:
+//     // ThreadPool::IDispatcher
+//     // -------------------------------------------------------------
+//     void Initialize() override {
+//     }
+//     void Deinitialize() override {
+//     }
+//     void Dispatch(Thunder::Core::IDispatch* job) override {
+//         job->Dispatch();
+//     }
 
-    // IIPCServer
-    // -------------------------------------------------------------
-    void Procedure(Thunder::Core::IPCChannel& channel, Thunder::Core::ProxyType<Thunder::Core::IIPC>& data) override {
-        Thunder::Core::ProxyType<Thunder::RPC::Job> job(Thunder::RPC::Job::Instance());
+//     // IIPCServer
+//     // -------------------------------------------------------------
+//     void Procedure(Thunder::Core::IPCChannel& channel, Thunder::Core::ProxyType<Thunder::Core::IIPC>& data) override {
+//         Thunder::Core::ProxyType<Thunder::RPC::Job> job(Thunder::RPC::Job::Instance());
 
-        job->Set(channel, data);
+//         job->Set(channel, data);
 
-        WorkerPool::Submit(Thunder::Core::ProxyType<Thunder::Core::IDispatch>(job));
-    }
+//         WorkerPool::Submit(Thunder::Core::ProxyType<Thunder::Core::IDispatch>(job));
+//     }
 
-private:
-    Thunder::Core::IIPCServer* _announceHandler;
-};
+// private:
+//     Thunder::Core::IIPCServer* _announceHandler;
+// };
 
 int main(int argc, char* argv[])
 {
@@ -296,47 +296,64 @@ int main(int argc, char* argv[])
         #ifdef __WINDOWS__
         Thunder::Core::NodeId nodeId("127.0.0.1:5522");
         #else
-        Thunder::Core::NodeId nodeId("/tmp/Dictionary/communicator");
+        Thunder::Core::NodeId nodeId("tmp/SecurityAgent/token");
         #endif
         Thunder::Core::ProxyObject<Thunder::RPC::CommunicatorClient> client(nodeId);
         client.AddRef();
 
-        Thunder::Exchange::IDictionary* pluginOnly = client.Open<Thunder::Exchange::IDictionary>(_T(""));
+        Thunder::PluginHost::IAuthenticate* pluginOnly = client.Open<Thunder::PluginHost::IAuthenticate>(_T(""));
 
         if (pluginOnly != nullptr) {
-            Thunder::Core::Sink<Sink> sink(pluginOnly);
+            // Thunder::Core::Sink<Sink> sink(pluginOnly);
 
-            pluginOnly->Register(_T("/name"), &sink);
+            // pluginOnly->Register(_T("/name"), &sink);
 
-            int32_t counter = 0;
-            char keyPress;
+            // int32_t counter = 0;
+            // char keyPress;
 
-            do {
-                keyPress = toupper(getchar());
+            // do {
+            //     keyPress = toupper(getchar());
 
-                switch (keyPress) {
-                case 'S': {
+            //     switch (keyPress) {
+            //     case 'S': {
 
-                    string value = Thunder::Core::NumberType<int32_t>(counter++).Text();
-                    if (pluginOnly->Set(_T("/name"), _T("key"), value) == true) {
-                        printf("Set value: %s\n", value.c_str());
-                    }
-                    break;
-                }
-                case 'G': {
-                    string value;
-                    if (pluginOnly->Get(_T("/name"), _T("key"), value) == true) {
-                        printf("Get value: %s\n", value.c_str());
-                    }
-                    break;
+            //         string value = Thunder::Core::NumberType<int32_t>(counter++).Text();
+            //         if (pluginOnly->Set(_T("/name"), _T("key"), value) == true) {
+            //             printf("Set value: %s\n", value.c_str());
+            //         }
+            //         break;
+            //     }
+            //     case 'G': {
+            //         string value;
+            //         if (pluginOnly->Get(_T("/name"), _T("key"), value) == true) {
+            //             printf("Get value: %s\n", value.c_str());
+            //         }
+            //         break;
 
-                }
-                case 'Q': break;
-                default: break;
-                };
-            } while (keyPress != 'Q');
+            //     }
+            //     case 'Q': break;
+            //     default: break;
+            //     };
+            // } while (keyPress != 'Q');
 
-            pluginOnly->Unregister(_T("/"), &sink);
+            // pluginOnly->Unregister(_T("/"), &sink);
+
+            string token;
+            string payload = "http://localhost";
+            printf("WPEFramework::Plugin::SystemdConnector::Initialize()->PID<%d><%d> calling QueryInterfaceByCallsign\n", getpid(), gettid());
+            if (pluginOnly->CreateToken(static_cast<uint16_t>(payload.length()),
+                                        reinterpret_cast<const uint8_t *>(payload.c_str()),
+                                        token) == Thunder::Core::ERROR_NONE)
+            {
+                printf("WPEFramework::Plugin::SystemdConnector::Initialize()->PID<%d><%d> got security token<%s>\n", getpid(), gettid(), token.c_str());
+            }
+            else
+            {
+                printf("WPEFramework::Plugin::SystemdConnector::Initialize()->PID<%d><%d> failed to get security token\n", getpid(), gettid());
+            }            
+
+            string query = "token=" + token;
+                 
             pluginOnly->Release();
             pluginOnly = nullptr;
         }
@@ -348,55 +365,55 @@ int main(int argc, char* argv[])
         #ifdef __WINDOWS__
                 Thunder::Core::NodeId nodeId("127.0.0.1:62000");
         #else
-                Thunder::Core::NodeId nodeId("/tmp/communicator");
+                Thunder::Core::NodeId nodeId("tmp/SecurityAgent/token");
         #endif
 
 
-        Dictionary  dictionary(3000, nodeId, _T("Dictionary"));
-        char keyPress;
-        uint32_t counter = 8;
+        // Dictionary  dictionary(3000, nodeId, _T("Dictionary"));
+        // char keyPress;
+        // uint32_t counter = 8;
 
-        do {
-            keyPress = toupper(getchar());
+        // do {
+        //     keyPress = toupper(getchar());
             
-            switch (keyPress) {
-            case 'O': {
-                printf("Operations state issue: %s\n", dictionary.IsOperational() ? _T("true") : _T("false"));
-                break;
-            }
-            case 'S': {
+        //     switch (keyPress) {
+        //     case 'O': {
+        //         printf("Operations state issue: %s\n", dictionary.IsOperational() ? _T("true") : _T("false"));
+        //         break;
+        //     }
+        //     case 'S': {
 
-                string value = Thunder::Core::NumberType<int32_t>(counter++).Text();
-                if (dictionary.Set(_T("/name"), _T("key"), value) == true) {
-                    printf("Set value: %s\n", value.c_str());
-                }
-                break;
-            }
-            case 'G': {
-                string value;
-                if (dictionary.Get(_T("/name"), _T("key"), value) == true) {
-                    printf("Get value: %s\n", value.c_str());
-                }
-                break;
+        //         string value = Thunder::Core::NumberType<int32_t>(counter++).Text();
+        //         if (dictionary.Set(_T("/name"), _T("key"), value) == true) {
+        //             printf("Set value: %s\n", value.c_str());
+        //         }
+        //         break;
+        //     }
+        //     case 'G': {
+        //         string value;
+        //         if (dictionary.Get(_T("/name"), _T("key"), value) == true) {
+        //             printf("Get value: %s\n", value.c_str());
+        //         }
+        //         break;
 
-            }
-            case 'X': {
-                uint32_t count = 0;
-                while (count++ != 500000) {
-                    string value = Thunder::Core::NumberType<int32_t>(counter++).Text();
-                    if (dictionary.Set(_T("/name"), _T("key"), value) == true) {
-                        if (dictionary.Get(_T("/name"), _T("key"), value) == true) {
-                            printf("Iteration %6i: Set/Get value: %s\n", count, value.c_str());
-                        }
-                    }
-                }
-                break;
+        //     }
+        //     case 'X': {
+        //         uint32_t count = 0;
+        //         while (count++ != 500000) {
+        //             string value = Thunder::Core::NumberType<int32_t>(counter++).Text();
+        //             if (dictionary.Set(_T("/name"), _T("key"), value) == true) {
+        //                 if (dictionary.Get(_T("/name"), _T("key"), value) == true) {
+        //                     printf("Iteration %6i: Set/Get value: %s\n", count, value.c_str());
+        //                 }
+        //             }
+        //         }
+        //         break;
 
-            }
-            case 'Q': break;
-            default: break;
-            };
-        } while (keyPress != 'Q');
+        //     }
+        //     case 'Q': break;
+        //     default: break;
+        //     };
+        // } while (keyPress != 'Q');
     }
 
     printf("Prior to the call Dispose\n");
