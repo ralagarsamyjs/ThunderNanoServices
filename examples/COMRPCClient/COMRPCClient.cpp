@@ -340,16 +340,16 @@ int main(int argc, char* argv[])
 
             string token;
             string payload = "http://localhost";
-            printf("WPEFramework::Plugin::SystemdConnector::Initialize()->PID<%d><%d> calling QueryInterfaceByCallsign\n", getpid(), gettid());
+            printf("WPEFramework::Plugin::COMRPCClient::Initialize()->PID<%d><%d> calling pluginOnly->CreateToken\n", getpid(), gettid());
             if (pluginOnly->CreateToken(static_cast<uint16_t>(payload.length()),
                                         reinterpret_cast<const uint8_t *>(payload.c_str()),
                                         token) == Thunder::Core::ERROR_NONE)
             {
-                printf("WPEFramework::Plugin::SystemdConnector::Initialize()->PID<%d><%d> got security token<%s>\n", getpid(), gettid(), token.c_str());
+                printf("WPEFramework::Plugin::COMRPCClient::Initialize()->PID<%d><%d> got security token<%s>\n", getpid(), gettid(), token.c_str());
             }
             else
             {
-                printf("WPEFramework::Plugin::SystemdConnector::Initialize()->PID<%d><%d> failed to get security token\n", getpid(), gettid());
+                printf("WPEFramework::Plugin::COMRPCClient::Initialize()->PID<%d><%d> failed to get security token\n", getpid(), gettid());
             }            
 
             string query = "token=" + token;
